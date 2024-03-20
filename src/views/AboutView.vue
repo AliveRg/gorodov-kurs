@@ -3,7 +3,7 @@ import { defineComponent } from 'vue'
 import { RouterLink, RouterView } from 'vue-router'
 </script>
 <template>
-  <div>
+  <div class="md:mt-24">
     <div class="bg-[#2A4DAC]">
       <div class="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
         <h2 class="text-2xl font-bold tracking-tight text-white">Наша команда</h2>
@@ -24,10 +24,10 @@ import { RouterLink, RouterView } from 'vue-router'
             <div class="mt-4 flex justify-between">
               <div>
                 <h3 class="text-lg text-white font-medium">
-                  <a :href="product.href">
+                  <div :href="product.href">
                     <span aria-hidden="true" class="absolute inset-0" />
                     {{ product.name }}
-                  </a>
+                  </div>
                 </h3>
                 <p class="mt-1 text-md text-white">{{ product.color }}</p>
               </div>

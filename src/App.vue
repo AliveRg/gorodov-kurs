@@ -4,104 +4,99 @@ import { RouterLink, RouterView } from 'vue-router'
 </script>
 
 <template>
-  <header class="header md:mb-24">
-    <nav class="">
-      <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
-        <div class="relative flex h-16 items-center justify-between">
-          <div class="absolute inset-y-0 left-0 flex items-center sm:hidden">
-            <!-- Mobile menu button-->
-            <button
-              @click="menuOpen = !menuOpen"
-              type="button"
-              class="relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-[#FF8C27] hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
-              aria-controls="mobile-menu"
-              aria-expanded="false"
-            >
-              <span class="absolute -inset-0.5"></span>
-              <span class="sr-only">Open main menu</span>
-              <!--
-            Icon when menu is closed.
-
-            Menu open: "hidden", Menu closed: "block"
-          -->
-              <svg
-                class="block h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                aria-hidden="true"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
-                />
-              </svg>
-              <!--
-            Icon when menu is open.
-
-            Menu open: "block", Menu closed: "hidden"
-          -->
-              <svg
-                class="hidden h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                aria-hidden="true"
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
+  <header class="bg-white">
+    <nav
+      class="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8"
+      aria-label="Global"
+    >
+      <div class="flex lg:flex-1">
+        <a :to="{ name: 'about' }" class="-m-1.5 p-1.5">
+          <span class="sr-only">Your Company</span>
+          <div class="flex flex-shrink-0 items-center">
+            <img class="h-8 w-auto" src="@/assets/logo.webp" alt="Your Company" />
           </div>
-          <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
-            <div class="flex flex-shrink-0 items-center">
-              <img class="h-8 w-auto" src="@/assets/logo.webp" alt="Your Company" />
-            </div>
-            <div class="hidden sm:ml-6 sm:block">
-              <div class="flex space-x-4">
-                <!-- Current: "bg-gray-900 text-white", Default: "text-black/90 hover:bg-[#FF8C27] hover:text-white" -->
-                <RouterLink
-                  :to="{ name: 'home' }"
-                  class="hover:bg-[#FF8C27] text-black/90 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
-                  aria-current="page"
-                  >Главная</RouterLink
-                >
-                <RouterLink
-                  :to="{ name: 'about' }"
-                  class="text-black/90 hover:bg-[#FF8C27] hover:text-white rounded-md px-3 py-2 text-sm font-medium"
-                  >О Нас</RouterLink
-                >
-              </div>
-            </div>
-          </div>
-          <div
-            class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0"
-          >
-            <!-- Profile dropdown -->
-          </div>
-        </div>
+        </a>
       </div>
-
-      <!-- Mobile menu, show/hide based on menu state. -->
-      <div class="sm:hidden" id="mobile-menu" v-if="menuOpen">
-        <div class="space-y-1 px-2 pb-3 pt-2">
-          <!-- Current: "bg-gray-900 text-white", Default: "text-black/90 hover:bg-[#FF8C27] hover:text-white" -->
-          <RouterLink
-            :to="{ name: 'home' }"
-            class="hover:bg-[#FF8C27] text-black/90 hover:text-white block rounded-md px-3 py-2 text-base font-medium"
-            aria-current="page"
-            >Главная</RouterLink
-          >
-          <RouterLink
-            :to="{ name: 'about' }"
-            class="text-black/90 hover:bg-[#FF8C27] hover:text-white block rounded-md px-3 py-2 text-base font-medium"
-            >О Нас</RouterLink
-          >
-        </div>
+      <div class="flex lg:hidden">
+        <button
+          type="button"
+          class="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-700"
+          @click="mobileMenuOpen = true"
+        >
+          <span class="sr-only">Open main menu</span>
+          <Bars3Icon class="h-6 w-6" aria-hidden="true" />
+        </button>
+      </div>
+      <PopoverGroup class="hidden lg:flex lg:gap-x-12">
+        <RouterLink :to="{ name: 'home' }" class="text-sm font-semibold leading-6 text-gray-900"
+          >Главная</RouterLink
+        >
+        <RouterLink :to="{ name: 'about' }" class="text-sm font-semibold leading-6 text-gray-900"
+          >О Нас</RouterLink
+        >
+        <RouterLink :to="{ name: 'lkuser' }" class="text-sm font-semibold leading-6 text-gray-900"
+          >Личный кабинет</RouterLink
+        >
+      </PopoverGroup>
+      <div class="hidden lg:flex lg:flex-1 lg:justify-end">
+        <RouterLink :to="{ name: 'login' }" class="text-sm font-semibold leading-6 text-gray-900"
+          >Log in <span aria-hidden="true">&rarr;</span></RouterLink
+        >
       </div>
     </nav>
+    <Dialog as="div" class="lg:hidden" @close="mobileMenuOpen = false" :open="mobileMenuOpen">
+      <div class="fixed inset-0 z-10" />
+      <DialogPanel
+        class="fixed inset-y-0 right-0 z-10 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10"
+      >
+        <div class="flex items-center justify-between">
+          <a :to="{ name: 'about' }" class="-m-1.5 p-1.5">
+            <span class="sr-only">Your Company</span>
+            <img
+              class="h-8 w-auto"
+              src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
+              alt=""
+            />
+          </a>
+          <button
+            type="button"
+            class="-m-2.5 rounded-md p-2.5 text-gray-700"
+            @click="mobileMenuOpen = false"
+          >
+            <span class="sr-only">Close menu</span>
+            <XMarkIcon class="h-6 w-6" aria-hidden="true" />
+          </button>
+        </div>
+        <div class="mt-6 flow-root">
+          <div class="-my-6 divide-y divide-gray-500/10">
+            <div class="space-y-2 py-6">
+              <RouterLink
+                :to="{ name: 'home' }"
+                class="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
+                >Главная</RouterLink
+              >
+              <RouterLink
+                :to="{ name: 'about' }"
+                class="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
+                >О Нас</RouterLink
+              >
+              <RouterLink
+                :to="{ name: 'lkuser' }"
+                class="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
+                >Личный кабинет</RouterLink
+              >
+            </div>
+            <div class="py-6">
+              <RouterLink
+                :to="{ name: 'login' }"
+                class="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
+                >Log in</RouterLink
+              >
+            </div>
+          </div>
+        </div>
+      </DialogPanel>
+    </Dialog>
   </header>
   <RouterView />
 </template>
@@ -109,6 +104,7 @@ import { RouterLink, RouterView } from 'vue-router'
 export default defineComponent({
   data() {
     return {
+      mobileMenuOpen: false,
       menuOpen: false
     }
   },

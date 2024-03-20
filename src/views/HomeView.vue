@@ -16,7 +16,7 @@ import {
 </script>
 
 <template>
-    <main class="main">
+    <main class="main md:mt-24">
         <div
             class="relative -z-20 flex h-[90vh] flex-col justify-between bg-black/80 px-[15px] py-[20px] md:h-[100vh] md:px-[30px] md:py-[40px] lg:px-[40px] lg:pb-[60px]">
             <img src="@/assets/devise.png"
