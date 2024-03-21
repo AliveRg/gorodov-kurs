@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { defineComponent } from 'vue'
 import { RouterLink, RouterView } from 'vue-router'
+import { defineComponent } from 'vue'
 </script>
 <template>
   <div class="md:mt-24">
@@ -13,7 +13,7 @@ import { RouterLink, RouterView } from 'vue-router'
         >
           <div v-for="product in products" :key="product.id" class="group relative">
             <div
-              class="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-md bg-black lg:aspect-none group-hover:translate-y-[-10%] lg:h-80 transition-all"
+              class="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-md bg-black lg:aspect-none md:group-hover:translate-y-[-10%] lg:h-80 transition-all"
             >
               <img
                 :src="product.imageSrc"
@@ -451,8 +451,8 @@ import { RouterLink, RouterView } from 'vue-router'
           <div
             class="grid grid-cols-1 gap-x-8 gap-y-6 text-base font-semibold leading-7 text-white sm:grid-cols-2 md:flex lg:gap-x-10"
           >
-            <a v-for="link in links" :key="link.name" :href="link.href"
-              >{{ link.name }} <span aria-hidden="true">&rarr;</span></a
+            <RouterLink v-for="link in links" :key="link.name" :to="{ name: link.href }"
+              >{{ link.name }} <span aria-hidden="true">&rarr;</span></RouterLink
             >
           </div>
         </div>
@@ -465,16 +465,18 @@ import { RouterLink, RouterView } from 'vue-router'
 export default defineComponent({
   data() {
     return {
+      user: {},
       links: [
         {
           name: 'Главная',
-          href: '#'
+          href: 'home'
         },
         {
           name: 'О нас',
-          href: '#'
+          href: 'about'
         }
       ],
+
       rewiews: [
         {
           name: 'Анна Смит',
@@ -592,6 +594,19 @@ export default defineComponent({
           color: 'Тестировщик'
         }
       ]
+    }
+  },
+  created() {
+    window.scrollTo(0, 0)
+  },
+  watch: {
+    $route(to, from) {
+      window.scrollTo(0, 0)
+    }
+  },
+  mounted() {
+    if (localStorage.getItem('userData')) {
+      this.user = JSON.parse(localStorage.getItem('userData') || '')
     }
   }
 })

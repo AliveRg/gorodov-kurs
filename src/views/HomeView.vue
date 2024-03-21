@@ -2,6 +2,7 @@
 import {
     defineComponent
 } from 'vue'
+import axios from 'axios'
 import {
     RouterLink,
     RouterView
@@ -16,7 +17,29 @@ import {
 </script>
 
 <template>
-    <main class="main md:mt-24">
+    <main class="main relative md:mt-24">
+        <div v-if="isOpen"
+            class="fixed left-0 top-0 z-20 flex h-screen w-screen items-center justify-center bg-black/70">
+            <div class="absolute z-20 mx-auto flex max-w-lg items-center px-6 py-20 lg:px-8">
+                <div class="flex h-[20vh] w-[40vw] items-center justify-center rounded-2xl bg-white p-6 shadow-xl">
+
+                    <div class="">
+                        <label for="password" class="block text-sm font-medium leading-6 text-gray-900">Придумайте или
+                            введите пароль от аккаунта</label>
+                        <div class="mt-2">
+                            <input v-model="newUserOrder.password" type="text" name="password" id="last-name"
+                                autocomplete="password"
+                                class="block w-full rounded-md border-0 px-3 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#FF8C27] sm:text-sm sm:leading-6">
+                        </div>
+                        <div>
+                            <button @click="registerUser"
+                                class="mt-[30px] flex w-full justify-center rounded-md bg-[#FF8C27] px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-[#FF8C27]/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF8C27]">Отправить</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div
             class="relative -z-20 flex h-[90vh] flex-col justify-between bg-black/80 px-[15px] py-[20px] md:h-[100vh] md:px-[30px] md:py-[40px] lg:px-[40px] lg:pb-[60px]">
             <img src="@/assets/devise.png"
@@ -54,7 +77,6 @@ import {
             </p>
         </div>
         <div class="bg-gray-100">
-
         </div>
         <div class="bg-gray-100">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -107,14 +129,13 @@ import {
                         class="rounded-lg bg-gray-100" />
                     <img src="https://i.pinimg.com/564x/f0/8c/35/f08c355ec74e0a2828543a499383c521.jpg"
                         alt="Side of walnut card tray with card groove and recessed card area."
-                        class="rounded-lg bg-gray-100 max-h-[280px] w-full" />
+                        class="max-h-[280px] w-full rounded-lg bg-gray-100" />
                     <img src="https://i.pinimg.com/564x/f1/58/fe/f158feff035efa9fcbad4f16aec88ab8.jpg"
                         alt="Walnut card tray filled with cards and card angled in dedicated groove."
-                        class="rounded-lg bg-gray-100 max-h-[280px] w-full" />
+                        class="max-h-[280px] w-full rounded-lg bg-gray-100" />
                 </div>
             </div>
         </div>
-
         <div class="bg-white py-24 sm:py-32">
             <div class="mx-auto max-w-7xl px-6 lg:px-8">
                 <div class="mx-auto max-w-2xl lg:text-center">
@@ -153,39 +174,48 @@ import {
                 <div class="sm:col-span-3">
                     <label for="first-name" class="block text-sm font-medium leading-6 text-gray-900">Имя</label>
                     <div class="mt-2">
-                        <input type="text" name="first-name" id="first-name" autocomplete="given-name"
-                            class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#FF8C27] sm:text-sm sm:leading-6">
+                        <input v-model="newUserOrder.username" type="text" name="first-name" id="first-name"
+                            autocomplete="given-name"
+                            class="block w-full rounded-md border-0 px-3 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#FF8C27] sm:text-sm sm:leading-6">
                     </div>
                 </div>
 
                 <div class="sm:col-span-3">
                     <label for="last-name" class="block text-sm font-medium leading-6 text-gray-900">Фамилия</label>
                     <div class="mt-2">
-                        <input type="text" name="last-name" id="last-name" autocomplete="family-name"
-                            class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#FF8C27] sm:text-sm sm:leading-6">
+                        <input v-model="newUserOrder.userLastname" type="text" name="last-name" id="last-name"
+                            autocomplete="family-name"
+                            class="block w-full rounded-md border-0 px-3 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#FF8C27] sm:text-sm sm:leading-6">
+                    </div>
+                </div>
+                <div class="sm:col-span-3">
+                    <label for="email" class="block text-sm font-medium leading-6 text-gray-900">Почта</label>
+                    <div class="mt-2">
+                        <input v-model="newUserOrder.email" type="email" name="email" id="email" autocomplete="email"
+                            class="block w-full rounded-md border-0 px-3 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#FF8C27] sm:text-sm sm:leading-6">
                     </div>
                 </div>
                 <div class="sm:col-span-4">
-                    <label for="username" class="block text-sm font-medium leading-6 text-gray-900">Макет в figma или
-                        похожий сайт</label>
+                    <label for="username" class="block text-sm font-medium leading-6 text-gray-900">Ссылка на макет в figma</label>
                     <div class="mt-2">
                         <div
                             class="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-[#FF8C27] sm:max-w-md">
-                            <span
-                                class="flex select-none items-center pl-3 text-gray-500 sm:text-sm">workcation.com/</span>
-                            <input type="text" name="username" id="username" autocomplete="username"
-                                class="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
-                                placeholder="janesmith">
+                            
+                            <input v-model="newUserOrder.link" type="text" name="username" id="username"
+                                autocomplete="username"
+                                class="block flex-1 border-0 bg-transparent px-3 py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
+                                placeholder="https://www.google.com/">
                         </div>
                     </div>
                 </div>
 
                 <div class="col-span-full">
-                    <label for="about" class="block text-sm font-medium leading-6 text-gray-900">Что вы хотите получить
+                    <label for="about" class="block text-sm font-medium leading-6 text-gray-900">Что вы хотите
+                        получить
                         от сайта?</label>
                     <div class="mt-2">
-                        <textarea id="about" name="about" rows="3"
-                            class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#FF8C27] sm:text-sm sm:leading-6"></textarea>
+                        <textarea v-model="newUserOrder.description" id="about" name="about" rows="3"
+                            class="block w-full rounded-md border-0 px-3 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#FF8C27] sm:text-sm sm:leading-6"></textarea>
                     </div>
                     <p class="mt-3 text-sm leading-6 text-gray-600">Дополните характиристиками и возможными пожеланиями
                         по вашему заказу</p>
@@ -194,36 +224,15 @@ import {
 
 
                 <div class="col-span-full">
-                    <label for="cover-photo" class="block text-sm font-medium leading-6 text-gray-900">Прикрепите
-                        наброски или карту сайта для более точной оценки</label>
-                    <div class="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10">
-                        <div class="text-center">
-                            <svg class="mx-auto h-12 w-12 text-gray-300" viewBox="0 0 24 24" fill="currentColor"
-                                aria-hidden="true">
-                                <path fill-rule="evenodd"
-                                    d="M1.5 6a2.25 2.25 0 012.25-2.25h16.5A2.25 2.25 0 0122.5 6v12a2.25 2.25 0 01-2.25 2.25H3.75A2.25 2.25 0 011.5 18V6zM3 16.06V18c0 .414.336.75.75.75h16.5A.75.75 0 0021 18v-1.94l-2.69-2.689a1.5 1.5 0 00-2.12 0l-.88.879.97.97a.75.75 0 11-1.06 1.06l-5.16-5.159a1.5 1.5 0 00-2.12 0L3 16.061zm10.125-7.81a1.125 1.125 0 112.25 0 1.125 1.125 0 01-2.25 0z"
-                                    clip-rule="evenodd" />
-                            </svg>
-                            <div class="mt-4 flex text-sm leading-6 text-gray-600">
-                                <label for="file-upload"
-                                    class="relative cursor-pointer rounded-md bg-white font-semibold text-[#FF8C27] focus-within:outline-none focus-within:ring-2 focus-within:ring-[#FF8C27] focus-within:ring-offset-2 hover:text-[#FF8C27]/80">
-                                    <span>Upload a file</span>
-                                    <input id="file-upload" name="file-upload" type="file" class="sr-only">
-                                </label>
-                                <p class="pl-1">or drag and drop</p>
-                            </div>
-                            <p class="text-xs leading-5 text-gray-600">PNG, JPG, GIF up to 10MB</p>
-                        </div>
-                    </div>
+
                     <div>
-                        <button type="submit"
-                            class="mt-[30px] flex w-full justify-center rounded-md bg-[#FF8C27] px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-[#FF8C27]/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF8C27]">Sign
-                            in</button>
+                        <button @click="onToggle"
+                            class="mt-[30px] flex w-full justify-center rounded-md bg-[#FF8C27] px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-[#FF8C27]/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF8C27]">Submit</button>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="relative isolate overflow-hidden bg-gray-900 py-24 sm:py-32 mt-24">
+        <div class="relative isolate mt-24 overflow-hidden bg-gray-900 py-24 sm:py-32">
             <img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&crop=focalpoint&fp-y=.8&w=2830&h=1500&q=80&blend=111827&sat=-100&exp=15&blend-mode=multiply"
                 alt="" class="absolute inset-0 -z-10 h-full w-full object-cover object-right md:object-center" />
             <div class="hidden sm:absolute sm:-top-10 sm:right-1/2 sm:-z-10 sm:mr-10 sm:block sm:transform-gpu sm:blur-3xl"
@@ -244,20 +253,33 @@ import {
                 <div class="mx-auto mt-10 max-w-2xl lg:mx-0 lg:max-w-none">
                     <div
                         class="grid grid-cols-1 gap-x-8 gap-y-6 text-base font-semibold leading-7 text-white sm:grid-cols-2 md:flex lg:gap-x-10">
-                        <a v-for="link in links" :key="link.name" :href="link.href">{{ link.name }}
-                            <span aria-hidden="true">&rarr;</span></a>
+                        <RouterLink v-for="link in links" :key="link.name" :to="{ name: link.href }">
+                            {{ link.name }}
+                            <span aria-hidden="true">&rarr;</span>
+                        </RouterLink>
                     </div>
 
                 </div>
             </div>
         </div>
     </main>
+
 </template>
 
 <script lang="ts">
 export default defineComponent({
     data() {
         return {
+            user: {},
+            newUserOrder: {
+                username: '',
+                userLastname: '',
+                password: '',
+                description: '',
+                link: '',
+                email: ''
+            },
+            isOpen: false,
             featureslast: [{
                 name: 'QuickSite',
                 description: 'Разрабатываем сайты, которые загружаются моментально, обеспечивая высокую скорость доступа к информации для пользователей.',
@@ -281,15 +303,14 @@ export default defineComponent({
             ],
             links: [{
                 name: 'Главная',
-                href: '#'
+                href: 'home'
             },
             {
                 name: 'О нас',
-                href: '#'
+                href: 'about'
             },
-            
-            ],
 
+            ],
             callouts: [{
                 name: 'Интернет-магазины',
                 description: 'Идеально для прожад в интернете',
@@ -360,8 +381,100 @@ export default defineComponent({
             this.scrollY = window.scrollY * 0.9
 
         })
+
     },
-    computed: {}
+
+    methods: {
+        registerUser() {
+
+            let data = JSON.stringify({
+                "email": this.newUserOrder.email,
+                "username": this.newUserOrder.username,
+                "password": this.newUserOrder.password,
+                "usersename": this.newUserOrder.userLastname
+            });
+
+            let config = {
+                method: 'post',
+                maxBodyLength: Infinity,
+                url: 'http://localhost:1337/api/auth/local/register',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                data: data
+            };
+
+            axios.request(config)
+                .then((response) => {
+                    const jwt = response.data.jwt
+                    // Сохраняем токен в локальном хранилище
+
+                    window.localStorage.setItem('jwt', jwt)
+
+                   
+                    return jwt
+                    this.authLog();
+                    this.onToggle()
+                }).then((jwt) => {
+                    // Используем полученный токен для запроса данных пользователя
+                    return axios.get('http://localhost:1337/api/users/me?populate=*', {
+                        headers: {
+                            Authorization: 'Bearer ' + jwt // Используем токен в заголовке Authorization
+                        }
+                    })
+                })
+                .then((response) => {
+                    // Получаем данные пользователя из ответа
+                    const userData = response.data
+                    // Сохраняем данные пользователя в локальном хранилище
+                    window.localStorage.setItem('userData', JSON.stringify(userData))
+                    location.reload()
+                    setTimeout(() => {
+                        this.$router.push('/lk_user')
+                       
+                    }, 200)
+                })
+                .catch((error) => {
+                    console.log(error);
+                    this.authLog();
+                    this.onToggle()
+                });
+        },
+        authLog() {
+            axios
+                .post('http://localhost:1337/api/auth/local', {
+                    identifier: this.newUserOrder.email,
+                    password: this.newUserOrder.password,
+                })
+                .then(response => {
+                    const jwt = response.data.jwt
+                    // Сохраняем токен в локальном хранилище
+                    const userData = response.data
+                    window.localStorage.setItem('jwt', jwt)
+                    window.localStorage.setItem('userData', JSON.stringify(userData))
+                    // Handle success.
+                    location.reload()
+                    setTimeout(() => {
+                        this.$router.push('/lk_user')
+                       
+                    }, 200)
+                })
+                .catch(error => {
+                    // Handle error.
+                    console.log('An error occurred:', error.response);
+                });
+        },
+        onToggle() {
+            this.isOpen = !this.isOpen;
+            document.body.classList.toggle('overflow-hidden')
+        }
+    },
+    mounted() {
+        if (localStorage.getItem('userData')) {
+            this.user = JSON.parse(localStorage.getItem('userData') || '')
+        }
+    }
+
 })
 </script>
 
@@ -377,5 +490,15 @@ export default defineComponent({
     opacity: 0;
     transform: translateX(10%);
     position: absolute;
+}
+
+.fade-enter,
+.fade-leave-to {
+    opacity: 0;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 500ms ease-out;
 }
 </style>

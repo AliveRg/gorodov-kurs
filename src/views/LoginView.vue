@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { defineComponent } from 'vue'
 import { RouterLink, RouterView } from 'vue-router'
+import axios from 'axios'
 </script>
 
 <template>
@@ -15,11 +16,13 @@ import { RouterLink, RouterView } from 'vue-router'
               </h1>
             </div>
             <input
+              v-model="authUser.email"
               type="text"
               class="w-full h-12 text-gray-900 placeholder:text-gray-400 text-lg font-normal leading-7 rounded-full border-gray-300 border shadow-sm focus:outline-none px-4 mb-6"
-              placeholder="Username"
+              placeholder="Email"
             />
             <input
+              v-model="authUser.password"
               type="text"
               class="w-full h-12 text-gray-900 placeholder:text-gray-400 text-lg font-normal leading-7 rounded-full border-gray-300 border shadow-sm focus:outline-none px-4 mb-1"
               placeholder="Password"
@@ -29,11 +32,12 @@ import { RouterLink, RouterView } from 'vue-router'
                 >Forgot Password?</span
               >
             </a>
-            <button
-              class="w-full h-12 text-white text-center text-base font-semibold leading-6 rounded-full hover:bg-[#FF8C27] transition-all duration-700 bg-[#FF8C27]/90 shadow-sm mb-11"
+            <div
+              @click="authUsers()"
+              class="w-full flex items-center justify-center h-12 text-white text-center text-base font-semibold leading-6 rounded-full hover:bg-[#FF8C27] transition-all duration-700 bg-[#FF8C27]/90 shadow-sm mb-11"
             >
               Login
-            </button>
+            </div>
             <RouterLink
               to="register"
               class="flex justify-center text-gray-900 text-base font-medium leading-6"
@@ -51,9 +55,73 @@ import { RouterLink, RouterView } from 'vue-router'
 <script lang="ts">
 export default defineComponent({
   data() {
-    return {}
+    return {
+      user: {},
+      authUser: {
+        email: '',
+        password: ''
+      }
+    }
   },
-  created() {}
+  methods: {
+    logTest() {
+      console.log('test')
+    },
+    authUsers() {
+      let data = JSON.stringify({
+        identifier: this.authUser.email,
+        password: this.authUser.password
+      })
+
+      let config = {
+        method: 'post',
+        maxBodyLength: Infinity,
+        url: 'http://localhost:1337/api/auth/local',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        data: data
+      }
+
+      axios
+        .request(config)
+        .then((response) => {
+          const jwt = response.data.jwt
+          // Сохраняем токен в локальном хранилище
+
+          window.localStorage.setItem('jwt', jwt)
+
+          // Переходим на главную страницу
+          this.$router.push('/')
+          // Возвращаем токен из Promise для его последующего использования
+          return jwt
+        })
+        .then((jwt) => {
+          // Используем полученный токен для запроса данных пользователя
+          return axios.get('http://localhost:1337/api/users/me?populate=*', {
+            headers: {
+              Authorization: 'Bearer ' + jwt // Используем токен в заголовке Authorization
+            }
+          })
+        })
+        .then((response) => {
+          // Получаем данные пользователя из ответа
+          const userData = response.data
+          // Сохраняем данные пользователя в локальном хранилище
+          window.localStorage.setItem('userData', JSON.stringify(userData))
+          location.reload()
+        })
+        .catch((error) => {
+          console.log(error)
+          alert('error неверное имя пользователя или пароль')
+        })
+    }
+  },
+  mounted() {
+    if (localStorage.getItem('userData')) {
+      this.user = JSON.parse(localStorage.getItem('userData') || '')
+    }
+  }
 })
 </script>
 
