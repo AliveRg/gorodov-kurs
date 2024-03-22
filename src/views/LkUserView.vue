@@ -2,6 +2,7 @@
 import { defineComponent } from 'vue'
 import { RouterLink, RouterView } from 'vue-router'
 import { onMounted, ref } from 'vue'
+import axios from 'axios'
 </script>
 
 <template>
@@ -23,7 +24,7 @@ import { onMounted, ref } from 'vue'
       >
         <div class="block">
           <h3 class="font-manrope font-bold text-4xl text-gray-900 mb-1 max-sm:text-center">
-            {{ user.username }}
+            {{ user.username }} {{ user.usersename }}
           </h3>
         </div>
         <div class="grid grid-cols-2 min-[450px]:flex items-center gap-4">
@@ -38,7 +39,7 @@ import { onMounted, ref } from 'vue'
           >
             Заявки
           </button>
-          <button
+          <!-- <button
             @click="switchTab(1)"
             :class="
               CurrentNum == 1
@@ -48,18 +49,7 @@ import { onMounted, ref } from 'vue'
             class="rounded-full border border-solid py-2.5 px-5 font-semibold text-sm shadow-sm shadow-gray-100 transition-all duration-200"
           >
             Отзыв
-          </button>
-          <button
-            @click="switchTab(2)"
-            :class="
-              CurrentNum == 2
-                ? 'border-[#FF8C27] bg-[#FF8C27] text-white'
-                : 'border-gray-300 bg-gray-50 text-gray-900'
-            "
-            class="rounded-full border border-solid border-[#FF8C27] bg-[#FF8C27] py-2.5 px-5 font-semibold text-sm shadow-sm shadow-gray-100 transition-all duration-200"
-          >
-            История
-          </button>
+          </button> -->
         </div>
       </div>
     </div>
@@ -103,6 +93,25 @@ import { onMounted, ref } from 'vue'
               <p>
                 {{ app.description }}
               </p>
+            </div>
+          </div>
+        </div>
+        <div class="w-full md:flex justify-end">
+          <div
+            v-if="!app.statusActive"
+            class="flex items-center justify-center rounded-lg text-white px-2 mt-4 w-full md:w-1/5 bg-blue-600"
+          >
+            принята на обработку
+          </div>
+          <div
+            v-if="app.statusActive"
+            class="group relative flex items-center justify-center rounded-lg text-white px-2 mt-4 w-full md:w-1/5 bg-green-600"
+          >
+            заявка обратотана
+            <div
+              class="group-hover:flex hidden absolute top-[-70%] left-0 items-center justify-center rounded-lg text-white px-2 mb-2 w-max bg-gray-500"
+            >
+              отправили ответ вам на почту
             </div>
           </div>
         </div>
@@ -233,7 +242,8 @@ export default defineComponent({
             description: ' стильный сайт',
             createdAt: '2024-03-21T15:11:03.126Z',
             updatedAt: '2024-03-21T15:11:03.126Z',
-            publishedAt: null
+            publishedAt: null,
+            statusActive: null
           }
         ],
         avatar: null
@@ -254,6 +264,32 @@ export default defineComponent({
   methods: {
     switchTab(num: number) {
       this.CurrentNum = num
+      this.refreshUser()
+    },
+    refreshUser() {
+      let userId = this.user.id
+      let data = ''
+
+      let config = {
+        method: 'get',
+        maxBodyLength: Infinity,
+        url: `http://localhost:1337/api/users/${userId}/?populate=*`,
+        headers: {
+          Authorization: 'Bearer' + window.localStorage.getItem('jwt')
+        },
+        data: data
+      }
+
+      axios
+        .request(config)
+        .then((response) => {
+          const userResponse = response
+          window.localStorage.setItem('userData', JSON.stringify(userResponse.data))
+          this.user = userResponse.data
+        })
+        .catch((error) => {
+          console.log(error)
+        })
     }
   },
   watch: {

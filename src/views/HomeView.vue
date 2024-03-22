@@ -196,11 +196,12 @@ import {
                     </div>
                 </div>
                 <div class="sm:col-span-4">
-                    <label for="username" class="block text-sm font-medium leading-6 text-gray-900">Ссылка на макет в figma</label>
+                    <label for="username" class="block text-sm font-medium leading-6 text-gray-900">Ссылка на макет в
+                        figma</label>
                     <div class="mt-2">
                         <div
                             class="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-[#FF8C27] sm:max-w-md">
-                            
+
                             <input v-model="newUserOrder.link" type="text" name="username" id="username"
                                 autocomplete="username"
                                 class="block flex-1 border-0 bg-transparent px-3 py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
@@ -270,6 +271,8 @@ import {
 export default defineComponent({
     data() {
         return {
+            jwtApplication: '',
+            userId: '',
             user: {},
             newUserOrder: {
                 username: '',
@@ -386,7 +389,9 @@ export default defineComponent({
 
     methods: {
         registerUser() {
+            console.log('registerUser');
 
+            // регистрация или проверка на существования пользователя и переадресация на аунтефикацию
             let data = JSON.stringify({
                 "email": this.newUserOrder.email,
                 "username": this.newUserOrder.username,
@@ -405,17 +410,84 @@ export default defineComponent({
             };
 
             axios.request(config)
+
                 .then((response) => {
+                    console.log('registerUser => 1response');
+
                     const jwt = response.data.jwt
                     // Сохраняем токен в локальном хранилище
 
                     window.localStorage.setItem('jwt', jwt)
 
-                   
+
                     return jwt
-                    this.authLog();
-                    this.onToggle()
                 }).then((jwt) => {
+                    console.log('registerUser => 2response');
+
+                    // Используем полученный токен для запроса данных пользователя
+                    return axios.get('http://localhost:1337/api/users/me?populate=*', {
+                        headers: {
+                            Authorization: 'Bearer ' +
+                                jwt // Используем токен в заголовке Authorization
+                        }
+                    })
+                })
+                .then((response) => {
+                    console.log('registerUser => 3response');
+                    // Получаем данные пользователя из ответа
+                    const userData = response.data
+                    this.user = response.data
+                    // Сохраняем данные пользователя в локальном хранилище
+                    window.localStorage.setItem('userData', JSON.stringify(userData))
+                    // location.reload()
+                    this.addRelative()
+                    this.onToggle()
+
+                })
+                .catch((error) => {
+                    console.log('registerUser => error');
+
+                    console.log(error);
+                    this.authUser()
+
+                });
+        },
+
+        authUser() { //если пользователь уже существует используется этот метод
+            console.log('authUser');
+            let data = JSON.stringify({
+                identifier: this.newUserOrder.email,
+                password: this.newUserOrder.password
+            })
+
+            let config = {
+                method: 'post',
+                maxBodyLength: Infinity,
+                url: 'http://localhost:1337/api/auth/local',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                data: data
+            }
+
+            axios
+                .request(config)
+                .then((response) => {
+                    console.log('authUser => 1response');
+
+                    const jwt = response.data.jwt
+                    // Сохраняем токен в локальном хранилище
+                    this.jwtApplication = jwt
+
+                    window.localStorage.setItem('jwt', jwt)
+                    // Переходим на главную страницу
+                    this.$router.push('/')
+                    // Возвращаем токен из Promise для его последующего использования
+                    return jwt
+                })
+                .then((jwt) => {
+                    console.log('authUser => 2response');
+
                     // Используем полученный токен для запроса данных пользователя
                     return axios.get('http://localhost:1337/api/users/me?populate=*', {
                         headers: {
@@ -424,45 +496,97 @@ export default defineComponent({
                     })
                 })
                 .then((response) => {
+                    console.log('authUser => 3response');
+
                     // Получаем данные пользователя из ответа
                     const userData = response.data
+                    this.user = response.data
                     // Сохраняем данные пользователя в локальном хранилище
                     window.localStorage.setItem('userData', JSON.stringify(userData))
-                    location.reload()
+                    // location.reload()
                     setTimeout(() => {
-                        this.$router.push('/lk_user')
-                       
-                    }, 200)
+                        this.addRelative()
+                    }, 200);
+
                 })
                 .catch((error) => {
-                    console.log(error);
-                    this.authLog();
-                    this.onToggle()
-                });
+                    console.log('authUser => error');
+
+                    console.log(error)
+                    alert('error неверное имя пользователя или пароль')
+                })
         },
-        authLog() {
-            axios
-                .post('http://localhost:1337/api/auth/local', {
-                    identifier: this.newUserOrder.email,
-                    password: this.newUserOrder.password,
+        addRelative() {
+            console.log('addRelative');
+            console.log(window.localStorage.getItem('jwt'));
+
+            // для созданного или зарестрировавшегося пользователя добавление отношения заявки к нему
+
+            let data = JSON.stringify({
+                "data": {
+                    "linkmaket": this.newUserOrder.link,
+                    "description": this.newUserOrder.description,
+                    "users": this.user.id
+                }
+            });
+
+            let config = {
+                method: 'post',
+                maxBodyLength: Infinity,
+                url: 'http://localhost:1337/api/applications',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer' + this.jwtApplication
+                },
+                data: data
+            };
+
+            axios.request(config)
+                .then((response) => {
+                    console.log('addRelative => 1response');
+
+                    this.refreshUser()
+                    // location.reload()
+                    this.onToggle()
+                    console.log(JSON.stringify(response.data));
                 })
-                .then(response => {
-                    const jwt = response.data.jwt
-                    // Сохраняем токен в локальном хранилище
-                    const userData = response.data
-                    window.localStorage.setItem('jwt', jwt)
-                    window.localStorage.setItem('userData', JSON.stringify(userData))
-                    // Handle success.
-                    location.reload()
-                    setTimeout(() => {
-                        this.$router.push('/lk_user')
-                       
-                    }, 200)
-                })
-                .catch(error => {
-                    // Handle error.
-                    console.log('An error occurred:', error.response);
+                .catch((error) => {
+                    console.log('addRelative => error');
+
+                    console.log(error);
                 });
+
+        },
+        refreshUser() {
+            console.log('refreshUser');
+
+            let userId = this.userId
+            let data = ''
+
+            let config = {
+                method: 'get',
+                maxBodyLength: Infinity,
+                url: `http://localhost:1337/api/users/${this.user.id}/?populate=*`,
+                headers: {
+                    Authorization: 'Bearer' + window.localStorage.getItem('jwt')
+                },
+                data: data
+            }
+
+            axios
+                .request(config)
+                .then((response) => {
+                    const userResponse = response
+                    window.localStorage.setItem('userData', JSON.stringify(userResponse.data))
+                    this.user = userResponse.data
+
+                     setTimeout(() => {
+                      location.reload()
+                    }, 200);
+                })
+                .catch((error) => {
+                    console.log(error)
+                })
         },
         onToggle() {
             this.isOpen = !this.isOpen;
